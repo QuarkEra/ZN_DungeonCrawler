@@ -26,6 +26,7 @@ void Dungeon::createDungeon()
 	item greenHerb;
 	greenHerb.health = 25;
 	greenHerb.name = "Green Herb";
+	greenHerb.type = 1;
 
 	rooms[1][1].items.push_back(greenHerb);
 	rooms[1][0].items.push_back(greenHerb);
@@ -33,6 +34,7 @@ void Dungeon::createDungeon()
 	item sword;
 	sword.name = "Master Sword";
 	sword.damage = 15;
+	sword.type = 2;
 
 	rooms[0][2].items.push_back(sword);
 }

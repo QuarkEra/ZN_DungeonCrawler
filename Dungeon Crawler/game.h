@@ -18,7 +18,9 @@ public:
 
 	std::vector<std::string> getMovementActions();
 	void handleMovement();
-	void printActions(std::vector<std::string>);
+	void printMovementActions(std::vector<std::string>);
+	void printItemActions(std::vector<std::string>);
+	void printFightActions(std::vector<std::string>);
 	void initiateRooms();
 	void handleEnemyActions();
 	void engageCombat();

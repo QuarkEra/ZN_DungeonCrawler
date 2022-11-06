@@ -6,8 +6,9 @@
 struct item
 {
 	std::string name;
-	int damage = 0;
-	int health = 0;
+	int type{}; // 1 = healing, 2 = damage
+	int damage{};
+	int health{};
 };
 
 #endif // !ITEM_CPP

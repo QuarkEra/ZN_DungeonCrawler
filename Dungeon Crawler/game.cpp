@@ -1,5 +1,6 @@
 #include "game.h"
 #include <iostream>
+#include <algorithm>
 
 Game::Game(Player* _player, Dungeon* _dungeon)
 {
@@ -27,7 +28,7 @@ void Game::initiateRooms()
 	{
 		handleItemActions();
 	}
-	else
+	else if (!isGameOver)
 	{
 		handleMovement();
 	}
@@ -36,21 +37,26 @@ void Game::initiateRooms()
 void Game::handleEnemyActions()
 {
 	std::cout << "An enemy " << player->currentRoom->enemies[0].getName() << " is here!" << std::endl;
-	std::vector<std::string> actions;
+	std::vector<std::string> fightActions;
 
-	actions.push_back("Engage");
-	actions.push_back("Retreat");
-	printActions(actions);
+	fightActions.push_back("(F)ight");
+	fightActions.push_back("(r)etreat");
+	printFightActions(fightActions);
 
-	int input;
-	std::cin >> input;
-	if (input == 1)
+	std::string input;
+	std::getline(std::cin, input);
+	if (input == "retreat" || input == "r")
+	{
+		player->retreat();
+		return;
+	}
+	else if (input == "fight" || input == "f")
 	{
 		engageCombat();
 	}
 	else
 	{
-		player->retreat();
+		puts("Please only enter valid responses indicated by brackets, 'f' in (F)ight for example.\n");
 	}
 }
 
@@ -71,7 +77,7 @@ void Game::engageCombat()
 		}
 
 		player->recieveDamage(enemy->getDamage());
-		std::cout << "You are injured by " << enemy->getName() << " for " << enemy->getDamage() << " points of damage! \n";
+		std::cout << enemy->getName() << " counters your attack for " << enemy->getDamage() << " points of damage! \n";
 		std::cout << "You now have " << player->getHealth() << "HP left." << std::endl;
 		if (!player->isAlive())
 		{
@@ -82,15 +88,23 @@ void Game::engageCombat()
 
 		puts("Keep fighting or run away?");
 		std::vector<std::string> actions;
-		actions.push_back("Fight!");
-		actions.push_back("Retreat!");
-		printActions(actions);
-		int input;
-		std::cin >> input;
-		if (input == 2)
+		actions.push_back("Fight");
+		actions.push_back("retreat");
+		printFightActions(actions);
+		std::string input;
+		std::getline(std::cin, input);
+		if (input == "r")
 		{
 			player->retreat();
 			return;
+		}
+		else if (input == "f")
+		{
+			continue;
+		}
+		else
+		{
+			puts("Please only enter valid responses indicated by brackets, 'f' in (F)ight for example.\n");
 		}
 	}
 }
@@ -98,23 +112,34 @@ void Game::engageCombat()
 void Game::handleItemActions()
 {
 	item item = player->currentRoom->items[0];
-	std::cout << "You found a " << item.name << "!" << std::endl;
-	std::vector<std::string> actions;
-	actions.push_back("Pick it up");
-	actions.push_back("Leave it");
-	printActions(actions);
+	std::cout << "You found a " << item.name << "..." << std::endl;
+	std::vector<std::string> itemActions;
+	itemActions.push_back("(p)ick it up");
+	itemActions.push_back("(l)eave it");
+	printItemActions(itemActions);
 
-	int input;
-	std::cin >> input;
-	if (input == 1)
+	std::string input;
+	std::getline(std::cin, input);
+	if (input == "p")
 	{
 		player->pickUpItem(item);
-		std::cout << "Your HP is " << player->getHealth() << " and damage is now " << player->getDamage() << "." << std::endl;
+		if (item.type == 1)
+		{
+			std::cout << "You feel refreshed, your HP increases to " << player->getHealth() << "." << std::endl;
+		}
+		else if (item.type == 2)
+		{
+			std::cout << "You feel stronger than ever, your damage has increased to " << player->getDamage() << "." << std::endl;
+		}
 		player->currentRoom->items.clear();
+	}
+	else if (input == "l")
+	{
+		handleMovement();
 	}
 	else
 	{
-		handleMovement();
+		puts("Please only enter valid responses indicated by brackets, 'f' in (F)ight for example.\n");
 	}
 }
 
@@ -123,10 +148,6 @@ std::vector<std::string> Game::getMovementActions()
 	std::vector<std::string> actions;
 
 	room* currentRoom = player->currentRoom;
-	if (currentRoom->col > 0)
-	{
-		actions.push_back("West");
-	}
 	if (currentRoom->row > 0)
 	{
 		actions.push_back("North");
@@ -139,40 +160,67 @@ std::vector<std::string> Game::getMovementActions()
 	{
 		actions.push_back("South");
 	}
-
+	if (currentRoom->col > 0)
+	{
+		actions.push_back("West");
+	}
 	return actions;
 }
 
-void Game::printActions(std::vector<std::string> actions)
+void Game::printMovementActions(std::vector<std::string> actions)
 {
 	for (int i = 0; i < signed(actions.size()); i++)
 	{
-		std::cout << i + 1 << ". " << actions[i] << std::endl;
+		std::cout << actions[i] << ", ";
 	}
+	puts("where will you go?");
+}
+
+void Game::printItemActions(std::vector<std::string> itemActions)
+{
+	for (size_t i = 0; i < itemActions.size(); i++)
+	{
+		std::cout << itemActions[i] << ", ";
+	}
+	puts("what will you do?");
+}
+
+void Game::printFightActions(std::vector<std::string> fightActions)
+{
+	for (size_t i = 0; i < fightActions.size(); i++)
+	{
+		std::cout << fightActions[i] << ", ";
+	}
+	puts("what will you do?");
 }
 
 void Game::handleMovement()
 {
 	std::vector<std::string> actions = getMovementActions();
-	printActions(actions);
-	int input;
-	std::cin >> input;
-	std::string chosenAction = actions[input - 1];
+	printMovementActions(actions);
+	std::string input;
+	std::getline(std::cin, input);
+	
+	std::transform(input.begin(), input.end(), input.begin(), ::tolower);
 	
 	int horzMove = 0;
 	int vertMove = 0;
-	if (chosenAction == "West")
+	if (input == "west" || input == "w")
 	{
 		horzMove = -1;
-	}	else if (chosenAction == "East")
+	}	else if (input == "east" || input == "e")
 	{
 		horzMove = 1;
-	}	else if (chosenAction == "North")
+	}	else if (input == "north" || input == "n")
 	{
 		vertMove = -1;
-	}	else if (chosenAction == "South")
+	}	else if (input == "south" || input == "s")
 	{
 		vertMove = 1;
+	}
+	else
+	{
+		puts("Please only enter valid responses indicated by brackets, 'f' in (F)ight for example.\n");
 	}
 
 	room* newRoom = &dungeon->rooms[player->currentRoom->row + vertMove][player->currentRoom->col + horzMove];
