@@ -1,3 +1,4 @@
+
 // Dungeon Crawler.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
@@ -20,6 +21,7 @@ int main()
 	while (!game.isGameOver)
 	{
 		game.initiateRooms();
+		std::this_thread::sleep_for(std::chrono::milliseconds(66));
 	}
 
 	return 0;

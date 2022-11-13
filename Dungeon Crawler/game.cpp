@@ -11,29 +11,6 @@ Game::Game(Player* _player, Dungeon* _dungeon)
 	player->currentRoom = &dungeon->rooms[dungeon->rows - 1][dungeon->cols - 1];
 }
 
-void Game::initiateRooms()
-{
-	room* room = player->currentRoom;
-
-	if (room->row == 0 && room->col == 0 && room->enemies.empty())
-	{
-		std::cout << "Congratulations! Now you are the strongest monster in the dungeon, " << player->getName() << "!" << std::endl;
-		isGameOver = true;
-	}
-	if (!player->currentRoom->enemies.empty())
-	{
-		handleEnemyActions();
-	}
-	else if (!player->currentRoom->items.empty())
-	{
-		handleItemActions();
-	}
-	else if (!isGameOver)
-	{
-		handleMovement();
-	}
-}
-
 void Game::handleEnemyActions()
 {
 	std::cout << "An enemy " << player->currentRoom->enemies[0].getName() << " is here!" << std::endl;
@@ -76,8 +53,11 @@ void Game::engageCombat()
 			return;
 		}
 
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
 		player->recieveDamage(enemy->getDamage());
 		std::cout << enemy->getName() << " counters your attack for " << enemy->getDamage() << " points of damage! \n";
+		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 		std::cout << "You now have " << player->getHealth() << "HP left." << std::endl;
 		if (!player->isAlive())
 		{
@@ -86,10 +66,12 @@ void Game::engageCombat()
 			return;
 		}
 
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+
 		puts("Keep fighting or run away?");
 		std::vector<std::string> actions;
-		actions.push_back("Fight");
-		actions.push_back("retreat");
+		actions.push_back("(f)ight");
+		actions.push_back("(r)etreat");
 		printFightActions(actions);
 		std::string input;
 		std::getline(std::cin, input);
@@ -143,6 +125,31 @@ void Game::handleItemActions()
 	}
 }
 
+void Game::initiateRooms()
+{
+	room* room = player->currentRoom;
+
+	if (room->row == 0 && room->col == 0 && room->enemies.empty())
+	{
+		std::cout << "Congratulations! Now you are the strongest monster in the dungeon, " << player->getName() << "!" << std::endl;
+		puts("This thread will self-destruct in three seconds...");
+		std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+		isGameOver = true;
+	}
+	if (!player->currentRoom->enemies.empty())
+	{
+		handleEnemyActions();
+	}
+	else if (!player->currentRoom->items.empty())
+	{
+		handleItemActions();
+	}
+	else if (!isGameOver)
+	{
+		handleMovement();
+	}
+}
+
 std::vector<std::string> Game::getMovementActions()
 {
 	std::vector<std::string> actions;
@@ -169,7 +176,7 @@ std::vector<std::string> Game::getMovementActions()
 
 void Game::printMovementActions(std::vector<std::string> actions)
 {
-	for (int i = 0; i < signed(actions.size()); i++)
+	for (int i = 0; i < actions.size(); i++)
 	{
 		std::cout << actions[i] << ", ";
 	}
