@@ -2,10 +2,11 @@
 #include <iostream>
 #include <algorithm>
 
-Game::Game(Player* _player, Dungeon* _dungeon)
+Game::Game(Player* _player, Dungeon* _dungeon, NPC* _npc)
 {
 	player = _player;
 	dungeon = _dungeon;
+	trader = _npc;
 	isGameOver = false;
 	dungeon->createDungeon();
 	player->currentRoom = &dungeon->rooms[dungeon->rows - 1][dungeon->cols - 1];
@@ -125,6 +126,33 @@ void Game::handleItemActions()
 	}
 }
 
+void Game::handleTrader()
+{
+	NPC npc = player->currentRoom->npcs[0];
+	std::cout << "A ghastly figure emerges from the shadows and offers you a deal...\n you can trade half your current health and recieve a great gift of strength or lose half your strength and recover your health to it's maximum...\n you must make a choice to leave." << std::endl;
+	std::vector<std::string> traderActions;
+	traderActions.push_back("(h)ealth for damage");
+	traderActions.push_back("(d)amage for health");
+	printTraderActions(traderActions);
+
+	std::string input;
+	std::getline(std::cin, input);
+	if (input == "h")
+	{
+		int playerHP = player->getHealth();
+		player->recieveDamage(int(playerHP * 0.5));
+		int playerDamage = player->getDamage();
+		player->buffStrength(playerDamage);
+		std::cout << "You feel weaker instantly, your health is now " << player->getHealth() << "." << std::endl;
+		std::cout << "But your strength is incredible, your damage is now " << player->getDamage() << "." << std::endl;
+		player->currentRoom->npcs.clear();
+	} 
+	else
+	{
+		puts("Please only enter valid responses indicated by brackets, 'd' in (d)amage for example.\n");
+	}
+}
+
 void Game::initiateRooms()
 {
 	room* room = player->currentRoom;
@@ -143,6 +171,10 @@ void Game::initiateRooms()
 	else if (!player->currentRoom->items.empty())
 	{
 		handleItemActions();
+	}
+	else if (!player->currentRoom->npcs.empty())
+	{
+		handleTrader();
 	}
 	else if (!isGameOver)
 	{
@@ -174,9 +206,12 @@ std::vector<std::string> Game::getMovementActions()
 	return actions;
 }
 
+// These prints were going to be extended for more varied gameplay but I think that will come
+// when I find more demonstrations of OOP to include beyond the "trader" I have added
+
 void Game::printMovementActions(std::vector<std::string> actions)
 {
-	for (int i = 0; i < actions.size(); i++)
+	for (int i = 0; i < signed(actions.size()); i++)
 	{
 		std::cout << actions[i] << ", ";
 	}
@@ -197,6 +232,15 @@ void Game::printFightActions(std::vector<std::string> fightActions)
 	for (size_t i = 0; i < fightActions.size(); i++)
 	{
 		std::cout << fightActions[i] << ", ";
+	}
+	puts("what will you do?");
+}
+
+void Game::printTraderActions(std::vector<std::string> traderActions)
+{
+	for (size_t i = 0; i < traderActions.size(); i++)
+	{
+		std::cout << traderActions[i] << ", ";
 	}
 	puts("what will you do?");
 }

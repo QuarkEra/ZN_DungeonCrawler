@@ -12,6 +12,7 @@ protected:
 	int damage;
 
 public:
+	GameCharacter();
 	GameCharacter(std::string, int, int);
 
 	void recieveDamage(int);

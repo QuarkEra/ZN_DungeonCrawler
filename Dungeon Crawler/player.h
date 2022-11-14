@@ -18,6 +18,7 @@ public:
 	void moveToRoom(room*);
 	void retreat();
 	void pickUpItem(item);
+	void buffStrength(int);
 };
 
 #endif // !PLAYER_H

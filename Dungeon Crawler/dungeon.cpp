@@ -1,5 +1,6 @@
 #include "dungeon.h"
 #include "item.cpp"
+#include "npc.h"
 
 void Dungeon::createDungeon()
 {
@@ -37,4 +38,7 @@ void Dungeon::createDungeon()
 	sword.type = 2;
 
 	rooms[0][2].items.push_back(sword);
+
+	NPC trader = NPC("Trader", 300, 50);
+	rooms[2][0].npcs.push_back(trader);
 }

@@ -15,8 +15,8 @@ int main()
 	std::cout << "Luck be with you, " << player.getName() << "." << std::endl;
 
 	Dungeon dungeon;
-	Game game = Game(&player, &dungeon);
-
+	NPC trader;
+	Game game = Game(&player, &dungeon, &trader);
 
 	while (!game.isGameOver)
 	{

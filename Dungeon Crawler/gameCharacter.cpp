@@ -1,5 +1,13 @@
 #include "gameCharacter.h"
 
+
+GameCharacter::GameCharacter() {
+	name = {};
+	damage = {};
+	maxHealth = {};
+	currentHealth = {};
+}
+
 GameCharacter::GameCharacter(std::string _name, int _health, int _damage)
 {
 	name = _name;

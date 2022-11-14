@@ -32,3 +32,8 @@ void Player::pickUpItem(item item)
 	currentHealth += item.health;
 	heal(item.health);
 }
+
+void Player::buffStrength(int _damage)
+{
+	damage += _damage;
+}
