@@ -8,9 +8,6 @@ class NPC: public GameCharacter
 public:
 	NPC();
 	NPC(std::string, int, int);
-
-	void tradeHealthForDamage();
-	void tradeDamageForHealth();
 };
 
 #endif

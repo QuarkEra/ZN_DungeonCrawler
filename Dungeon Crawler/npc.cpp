@@ -6,12 +6,3 @@ NPC::NPC(std::string _name, int _health, int _damage): GameCharacter(_name, _hea
 {
 }
 
-void NPC::tradeHealthForDamage()
-{
-
-}
-
-void NPC::tradeDamageForHealth()
-{
-}
-
