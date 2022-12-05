@@ -253,25 +253,25 @@ void Game::handleMovement()
 	std::getline(std::cin, input);
 	
 	std::transform(input.begin(), input.end(), input.begin(), ::tolower);
-	
+
 	int horzMove = 0;
 	int vertMove = 0;
-	if (input == "west" || input == "w")
+	if (input == "w" && player->currentRoom->col > 0)
 	{
 		horzMove = -1;
-	}	else if (input == "east" || input == "e")
+	}	else if (input == "e" && player->currentRoom->col < 2)
 	{
 		horzMove = 1;
-	}	else if (input == "north" || input == "n")
+	}	else if (input == "n" && player->currentRoom->row > 0)
 	{
 		vertMove = -1;
-	}	else if (input == "south" || input == "s")
+	}	else if (input == "s" && player->currentRoom->row < 2)
 	{
 		vertMove = 1;
 	}
 	else
 	{
-		puts("Please only enter valid responses indicated by brackets, 'f' in (F)ight for example.\n");
+		puts("Please only enter valid responses indicated by brackets, 'f' in (f)ight for example.\n");
 	}
 
 	room* newRoom = &dungeon->rooms[player->currentRoom->row + vertMove][player->currentRoom->col + horzMove];
