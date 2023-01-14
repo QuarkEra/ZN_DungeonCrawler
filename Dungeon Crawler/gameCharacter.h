@@ -22,4 +22,4 @@ public:
 	int getDamage();
 };
 
-#endif // !GAMECHARACTER_H
+#endif

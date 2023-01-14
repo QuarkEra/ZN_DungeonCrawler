@@ -13,4 +13,4 @@ public:
 	void createDungeon();
 };
 
-#endif DUNGEON_H
+#endif

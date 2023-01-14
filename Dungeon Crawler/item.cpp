@@ -9,6 +9,9 @@ struct item
 	int type{}; // 1 = healing, 2 = damage
 	int damage{};
 	int health{};
+	bool isConsumable;
+	int uses;
+	int maxUses;
 };
 
-#endif // !ITEM_CPP
+#endif

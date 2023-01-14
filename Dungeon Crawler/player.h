@@ -13,13 +13,14 @@ public:
 	Player(std::string, int, int);
 
 	room* currentRoom{};
+	std::vector<item> inventory;
 
 	void heal(int);
 	void moveToRoom(room*);
 	void retreat();
-	void pickUpItem(item);
+	void pickUpItem(struct item);
 	void buffStrength(int);
 };
 
-#endif // !PLAYER_H
+#endif
 

@@ -4,6 +4,8 @@ Player::Player(std::string _name, int _health, int _damage): GameCharacter(_name
 {	
 }
 
+std::vector<item> inventory;
+
 void Player::heal(int amount)
 {
 	currentHealth += amount;
@@ -26,7 +28,7 @@ void Player::retreat()
 	previousRoom = tempRoom;
 }
 
-void Player::pickUpItem(item item)
+void Player::pickUpItem(struct item item)
 {
 	damage += item.damage;
 	currentHealth += item.health;

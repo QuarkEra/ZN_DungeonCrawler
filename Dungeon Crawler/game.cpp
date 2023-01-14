@@ -12,72 +12,28 @@ Game::Game(Player* _player, Dungeon* _dungeon, NPC* _npc)
 	player->currentRoom = &dungeon->rooms[dungeon->rows - 1][dungeon->cols - 1];
 }
 
-void Game::handleEnemyActions()
-{
-	std::cout << "An enemy " << player->currentRoom->enemies[0].getName() << " is here!" << std::endl;
-	std::vector<std::string> fightActions;
-
-	fightActions.push_back("(F)ight");
-	fightActions.push_back("(r)etreat");
-	printActions(fightActions);
-
-	std::string input;
-	std::getline(std::cin, input);
-	std::transform(input.begin(), input.end(), input.begin(), ::tolower);
-	
-	if (input == "retreat" || input == "r")
-	{
-		player->retreat();
-		return;
-	}
-	else if (input == "fight" || input == "f")
-	{
-		engageCombat();
-	}
-	else
-	{
-		puts("Please only enter valid responses indicated by brackets, 'f' in (F)ight for example.\n");
-	}
-}
-
 void Game::engageCombat()
 {
 	GameCharacter* enemy = &player->currentRoom->enemies[0];
 	while (true)
 	{
 		room* room = player->currentRoom;
+		if (!player->inventory.empty())
+		{
+			std::cout << "You have " << player->getHealth() << "HP, and " << player->inventory[0].name << " with " << (player->inventory[0].maxUses - player->inventory[0].uses) << " uses remaining." << std::endl;
+		} else {
+			puts("You have no potions to use.");
+		}
 		
-		enemy->recieveDamage(player->getDamage());
-		std::cout << "You hit " << enemy->getName() << " for " << player->getDamage() << " points of damage!\n";
-		if (!enemy->isAlive())
-		{
-			puts("You are victorious!");
-			player->currentRoom->enemies.clear();		
-			return;
-		}
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-		player->recieveDamage(enemy->getDamage());
-		std::cout << enemy->getName() << " counters your attack for " << enemy->getDamage() << " points of damage! \n";
-		std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-		std::cout << "You now have " << player->getHealth() << "HP left." << std::endl;
-		if (!player->isAlive())
-		{
-			isGameOver = true;
-			puts("Valiant effort!");
-			return;
-		}
-
-		std::this_thread::sleep_for(std::chrono::milliseconds(500));
-
 		puts("Keep fighting or run away?");
 		std::vector<std::string> actions;
 		actions.push_back("(f)ight");
 		actions.push_back("(r)etreat");
+		if (!player->inventory.empty()) actions.push_back("(u)se potion");
 		printActions(actions);
 		std::string input;
 		std::getline(std::cin, input);
+		
 		if (input == "r")
 		{
 			player->retreat();
@@ -85,7 +41,38 @@ void Game::engageCombat()
 		}
 		else if (input == "f")
 		{
-			continue;
+			enemy->recieveDamage(player->getDamage());
+			std::cout << "You hit " << enemy->getName() << " for " << player->getDamage() << " points of damage!\n";
+			if (!enemy->isAlive())
+			{
+				puts("You are victorious!");
+				player->currentRoom->enemies.clear();
+				return;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			
+			player->recieveDamage(enemy->getDamage());
+			std::cout << enemy->getName() << " counters your attack for " << enemy->getDamage() << " points of damage! \n";
+			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+			std::cout << "You now have " << player->getHealth() << "HP left." << std::endl;
+			if (!player->isAlive())
+			{
+				isGameOver = true;
+				puts("Valiant effort!");
+				return;
+			}
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		}
+		else if (input == "u")
+		{
+			if (!(player->inventory[0].uses == player->inventory[0].maxUses)) {
+				++player->inventory[0].uses;
+				player->heal(player->inventory[0].health);
+				puts("You are healed...");
+			}
+			if (player->inventory[0].uses == player->inventory[0].maxUses) {
+				player->inventory.clear();
+			}
 		}
 		else
 		{
@@ -117,6 +104,10 @@ void Game::handleItemActions()
 		else if (item.type == 2)
 		{
 			std::cout << "You feel stronger than ever, your damage has increased to " << player->getDamage() << "." << std::endl;
+		}
+		else if (item.isConsumable)
+		{
+			player->inventory.push_back(item);
 		}
 		player->currentRoom->items.clear();
 	}
@@ -172,7 +163,7 @@ void Game::initiateRooms()
 	}
 	if (!player->currentRoom->enemies.empty())
 	{
-		handleEnemyActions();
+		engageCombat();
 	}
 	else if (!player->currentRoom->items.empty())
 	{
