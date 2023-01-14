@@ -19,10 +19,12 @@ void Game::handleEnemyActions()
 
 	fightActions.push_back("(F)ight");
 	fightActions.push_back("(r)etreat");
-	printFightActions(fightActions);
+	printActions(fightActions);
 
 	std::string input;
 	std::getline(std::cin, input);
+	std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+	
 	if (input == "retreat" || input == "r")
 	{
 		player->retreat();
@@ -73,7 +75,7 @@ void Game::engageCombat()
 		std::vector<std::string> actions;
 		actions.push_back("(f)ight");
 		actions.push_back("(r)etreat");
-		printFightActions(actions);
+		printActions(actions);
 		std::string input;
 		std::getline(std::cin, input);
 		if (input == "r")
@@ -99,10 +101,12 @@ void Game::handleItemActions()
 	std::vector<std::string> itemActions;
 	itemActions.push_back("(p)ick it up");
 	itemActions.push_back("(l)eave it");
-	printItemActions(itemActions);
+	printActions(itemActions);
 
 	std::string input;
 	std::getline(std::cin, input);
+	std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+	
 	if (input == "p")
 	{
 		player->pickUpItem(item);
@@ -133,10 +137,12 @@ void Game::handleTrader()
 	std::vector<std::string> traderActions;
 	traderActions.push_back("(h)ealth for damage");
 	traderActions.push_back("(d)amage for health");
-	printTraderActions(traderActions);
+	printActions(traderActions);
 
 	std::string input;
 	std::getline(std::cin, input);
+	std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+	
 	if (input == "h")
 	{
 		int playerHP = player->getHealth();
@@ -206,41 +212,11 @@ std::vector<std::string> Game::getMovementActions()
 	return actions;
 }
 
-// These prints were going to be extended for more varied gameplay but I think that will come
-// when I find more demonstrations of OOP to include beyond the "trader" I have added
-
-void Game::printMovementActions(std::vector<std::string> actions)
+void Game::printActions(std::vector<std::string> actions)
 {
-	for (int i = 0; i < signed(actions.size()); i++)
+	for (size_t i = 0; i < actions.size(); i++)
 	{
 		std::cout << actions[i] << ", ";
-	}
-	puts("where will you go?");
-}
-
-void Game::printItemActions(std::vector<std::string> itemActions)
-{
-	for (size_t i = 0; i < itemActions.size(); i++)
-	{
-		std::cout << itemActions[i] << ", ";
-	}
-	puts("what will you do?");
-}
-
-void Game::printFightActions(std::vector<std::string> fightActions)
-{
-	for (size_t i = 0; i < fightActions.size(); i++)
-	{
-		std::cout << fightActions[i] << ", ";
-	}
-	puts("what will you do?");
-}
-
-void Game::printTraderActions(std::vector<std::string> traderActions)
-{
-	for (size_t i = 0; i < traderActions.size(); i++)
-	{
-		std::cout << traderActions[i] << ", ";
 	}
 	puts("what will you do?");
 }
@@ -248,10 +224,11 @@ void Game::printTraderActions(std::vector<std::string> traderActions)
 void Game::handleMovement()
 {
 	std::vector<std::string> actions = getMovementActions();
-	printMovementActions(actions);
+	puts("Looking around you there are doors leading: \n");
+	printActions(actions);
+	
 	std::string input;
 	std::getline(std::cin, input);
-	
 	std::transform(input.begin(), input.end(), input.begin(), ::tolower);
 
 	int horzMove = 0;
