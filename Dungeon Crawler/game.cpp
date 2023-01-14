@@ -14,22 +14,29 @@ Game::Game(Player* _player, Dungeon* _dungeon, NPC* _npc)
 
 void Game::engageCombat()
 {
+	std::vector<item>::const_iterator c_iter; //for searching
+	std::vector<item>::iterator iter; // for modifying
+	
 	GameCharacter* enemy = &player->currentRoom->enemies[0];
+	std::cout << "A wild " << enemy->getName() << " attacks!" << std::endl;
 	while (true)
 	{
-		room* room = player->currentRoom;
+		std::vector<std::string> actions;
 		if (!player->inventory.empty())
 		{
-			std::cout << "You have " << player->getHealth() << "HP, and " << player->inventory[0].name << " with " << (player->inventory[0].maxUses - player->inventory[0].uses) << " uses remaining." << std::endl;
-		} else {
-			puts("You have no potions to use.");
+			for (c_iter = player->inventory.begin(); c_iter != player->inventory.end(); ++c_iter)
+			{
+				if (c_iter->type == 1)
+				{
+					std::cout << "You have " << c_iter->name << " with " << (c_iter->maxUses - c_iter->uses) << " uses remaining." << std::endl;
+					actions.push_back("(u)se potion");
+					break;
+				}
+			}
 		}
-		
-		puts("Keep fighting or run away?");
-		std::vector<std::string> actions;
 		actions.push_back("(f)ight");
 		actions.push_back("(r)etreat");
-		if (!player->inventory.empty()) actions.push_back("(u)se potion");
+		
 		printActions(actions);
 		std::string input;
 		std::getline(std::cin, input);
@@ -65,13 +72,16 @@ void Game::engageCombat()
 		}
 		else if (input == "u")
 		{
-			if (!(player->inventory[0].uses == player->inventory[0].maxUses)) {
-				++player->inventory[0].uses;
-				player->heal(player->inventory[0].health);
-				puts("You are healed...");
-			}
-			if (player->inventory[0].uses == player->inventory[0].maxUses) {
-				player->inventory.clear();
+			for (iter = player->inventory.begin(); iter != player->inventory.end(); ++iter) {
+				if (iter->type == 1 && iter->maxUses != iter->uses) {
+					++iter->uses;
+					player->heal(iter->health);
+					puts("You used the potion...");
+					std::cout << "You have " << player->getHealth() << "HP." << std::endl;
+					if (iter->uses == iter->maxUses) {
+						player->inventory.erase(iter);
+					}
+				}
 			}
 		}
 		else
@@ -97,13 +107,13 @@ void Game::handleItemActions()
 	if (input == "p")
 	{
 		player->pickUpItem(item);
-		if (item.type == 1)
-		{
-			std::cout << "You feel refreshed, your HP increases to " << player->getHealth() << "." << std::endl;
-		}
-		else if (item.type == 2)
+		if (item.type == 2)
 		{
 			std::cout << "You feel stronger than ever, your damage has increased to " << player->getDamage() << "." << std::endl;
+		}
+		else if (item.type == 3)
+		{
+			player->inventory.push_back(item);
 		}
 		else if (item.isConsumable)
 		{
@@ -127,7 +137,7 @@ void Game::handleTrader()
 	std::cout << "A ghastly figure emerges from the shadows and offers you a deal...\n you can trade half your current health and recieve a great gift of strength or lose half your strength and recover your health to it's maximum...\n you must make a choice to leave." << std::endl;
 	std::vector<std::string> traderActions;
 	traderActions.push_back("(h)ealth for damage");
-	traderActions.push_back("(d)amage for health");
+	traderActions.push_back("(b)eg for another option");
 	printActions(traderActions);
 
 	std::string input;
@@ -143,7 +153,13 @@ void Game::handleTrader()
 		std::cout << "You feel weaker instantly, your health is now " << player->getHealth() << "." << std::endl;
 		std::cout << "But your strength is incredible, your damage is now " << player->getDamage() << "." << std::endl;
 		player->currentRoom->npcs.clear();
-	} 
+		puts("The room is empty...");
+	}
+	else if (input == "b")
+	{
+		player->currentRoom->npcs.clear();
+		puts("The room is empty...");
+	}
 	else
 	{
 		puts("Please only enter valid responses indicated by brackets, 'd' in (d)amage for example.\n");
@@ -154,24 +170,38 @@ void Game::initiateRooms()
 {
 	room* room = player->currentRoom;
 
+	std::vector<item>::const_iterator c_iter;
+	
 	if (room->row == 0 && room->col == 0 && room->enemies.empty())
 	{
-		std::cout << "Congratulations! Now you are the strongest monster in the dungeon, " << player->getName() << "!" << std::endl;
-		puts("This thread will self-destruct in three seconds...");
-		std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-		isGameOver = true;
+		puts("There is a locked door where the enemy stood...");
+		for(c_iter = player->inventory.begin(); c_iter != player->inventory.end(); ++c_iter)
+		{
+			if (c_iter->type == 3)
+			{
+				puts("Will you use the key to open the door?\n");
+				puts("(y)es\n(n)o\n");
+				std::string input;
+				std::getline(std::cin, input);
+				std::transform(input.begin(), input.end(), input.begin(), ::tolower);
+				if (input == "y")
+				{
+					isGameOver = true;
+				}
+			}
+		}
 	}
 	if (!player->currentRoom->enemies.empty())
 	{
 		engageCombat();
 	}
-	else if (!player->currentRoom->items.empty())
-	{
-		handleItemActions();
-	}
 	else if (!player->currentRoom->npcs.empty())
 	{
 		handleTrader();
+	}
+	else if (!player->currentRoom->items.empty())
+	{
+		handleItemActions();
 	}
 	else if (!isGameOver)
 	{

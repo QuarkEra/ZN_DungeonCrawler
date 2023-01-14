@@ -25,6 +25,7 @@ void Dungeon::createDungeon()
 	item healthFlask;
 	healthFlask.name = "Potion";
 	healthFlask.health = 30;
+	healthFlask.type = 1;
 	healthFlask.uses = 0;
 	healthFlask.maxUses = 2;
 	healthFlask.isConsumable = true;
@@ -38,4 +39,9 @@ void Dungeon::createDungeon()
 
 	NPC trader = NPC("Trader", 300, 50);
 	rooms[2][0].npcs.push_back(trader);
+	
+	item key;
+	key.name = "Merchant's key";
+	key.type = 3;
+	rooms[2][0].items.push_back(key);
 }
