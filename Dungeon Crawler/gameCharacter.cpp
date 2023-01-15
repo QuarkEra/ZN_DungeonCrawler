@@ -8,7 +8,7 @@ GameCharacter::GameCharacter() {
 	currentHealth = {};
 }
 
-GameCharacter::GameCharacter(std::string _name, int _health, int _damage)
+GameCharacter::GameCharacter(const std::string& _name, int _health, int _damage)
 {
 	name = _name;
 	damage = _damage;
@@ -26,7 +26,7 @@ bool GameCharacter::isAlive()
 	return currentHealth > 0;
 }
 
-std::string GameCharacter::getName()
+std::string& GameCharacter::getName()
 {
 	return name;
 }

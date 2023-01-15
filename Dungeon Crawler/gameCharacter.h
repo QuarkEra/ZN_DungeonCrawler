@@ -13,11 +13,11 @@ protected:
 
 public:
 	GameCharacter();
-	GameCharacter(std::string, int, int);
+	GameCharacter(const std::string&, int, int);
 
 	void recieveDamage(int);
 	bool isAlive();
-	std::string getName();
+	std::string& getName();
 	int getHealth();
 	int getDamage();
 };

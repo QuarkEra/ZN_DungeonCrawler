@@ -9,7 +9,8 @@ Game::Game(Player* _player, Dungeon* _dungeon, NPC* _npc)
 	trader = _npc;
 	isGameOver = false;
 	dungeon->createDungeon();
-	player->currentRoom = &dungeon->rooms[dungeon->rows - 1][dungeon->cols - 1];
+	
+	player->currentRoom = &dungeon->rooms[dungeon->rows-1][dungeon->cols-1];
 }
 
 void Game::engageCombat()
@@ -158,7 +159,7 @@ void Game::handleTrader()
 	else if (input == "b")
 	{
 		player->currentRoom->npcs.clear();
-		puts("The room is empty...");
+		puts("A whisper of laughter fades and the room is empty...");
 	}
 	else
 	{
@@ -172,9 +173,9 @@ void Game::initiateRooms()
 
 	std::vector<item>::const_iterator c_iter;
 	
-	if (room->row == 0 && room->col == 0 && room->enemies.empty())
+	if (!room->doors.empty() && room->enemies.empty())
 	{
-		puts("There is a locked door where the enemy stood...");
+		puts("There is a locked door...");
 		for(c_iter = player->inventory.begin(); c_iter != player->inventory.end(); ++c_iter)
 		{
 			if (c_iter->type == 3)
@@ -245,7 +246,7 @@ void Game::printActions(std::vector<std::string> actions)
 void Game::handleMovement()
 {
 	std::vector<std::string> actions = getMovementActions();
-	puts("Looking around you there are doors leading: \n");
+	puts("Looking around you there are doors leading: ");
 	printActions(actions);
 	
 	std::string input;
@@ -257,13 +258,13 @@ void Game::handleMovement()
 	if (input == "w" && player->currentRoom->col > 0)
 	{
 		horzMove = -1;
-	}	else if (input == "e" && player->currentRoom->col < 2)
+	}	else if (input == "e" && player->currentRoom->col < dungeon->cols - 1)
 	{
 		horzMove = 1;
 	}	else if (input == "n" && player->currentRoom->row > 0)
 	{
 		vertMove = -1;
-	}	else if (input == "s" && player->currentRoom->row < 2)
+	}	else if (input == "s" && player->currentRoom->row < dungeon->rows - 1)
 	{
 		vertMove = 1;
 	}

@@ -8,11 +8,11 @@
 int main()
 {
 	std::string name;
-	puts("Greetings, brave adventurer! What is thy name?");
-	std::getline(std::cin, name);
-	Player player = Player(name, 100, 10);
+	//puts("Greetings, brave adventurer! What is thy name?");
+	//std::getline(std::cin, name);
+	Player player = Player("name", 100, 10);
 	
-	std::cout << "Luck be with you, " << player.getName() << "." << std::endl;
+	//std::cout << "Luck be with you, " << player.getName() << "." << std::endl;
 
 	Dungeon dungeon;
 	NPC trader;

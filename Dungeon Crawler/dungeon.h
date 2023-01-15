@@ -6,9 +6,9 @@
 class Dungeon
 {
 public:
-	const int rows = 3;
-	const int cols = 3;
-	room rooms[3][3];
+	const int rows = 4;
+	const int cols = 4;
+	room rooms[4][4];
 
 	void createDungeon();
 };

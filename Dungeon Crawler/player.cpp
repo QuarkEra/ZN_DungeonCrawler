@@ -1,6 +1,6 @@
 #include "player.h"
 
-Player::Player(std::string _name, int _health, int _damage): GameCharacter(_name, _health, _damage)
+Player::Player(const std::string& _name, int _health, int _damage): GameCharacter(_name, _health, _damage)
 {	
 }
 

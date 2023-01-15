@@ -10,7 +10,7 @@ private:
 	room* previousRoom{};
 
 public:
-	Player(std::string, int, int);
+	Player(const std::string&, int, int);
 
 	room* currentRoom{};
 	std::vector<item> inventory;
